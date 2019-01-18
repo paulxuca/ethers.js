@@ -272,10 +272,11 @@ declare module 'ethers/_version' {
 }
 
 declare module 'ethers/utils/libraries' {
-    import scrypt from 'scrypt-js';
-    export const setScrypt: (scryptFn: typeof scrypt) => void;
+    import scrypt from "scrypt-js";
+    import { pbkdf2 } from "ethers/utils/pbkdf2";
     const libraries: {
         scrypt: typeof scrypt;
+        pbkdf2: typeof pbkdf2;
     };
     export default libraries;
 }
@@ -1049,5 +1050,10 @@ declare module 'ethers/utils/hmac' {
         sha512 = "sha512"
     }
     export function computeHmac(algorithm: SupportedAlgorithms, key: Arrayish, data: Arrayish): Uint8Array;
+}
+
+declare module 'ethers/utils/pbkdf2' {
+    import { Arrayish } from 'ethers/utils/bytes';
+    export function pbkdf2(password: Arrayish, salt: Arrayish, iterations: number, keylen: number, hashAlgorithm: string): Uint8Array;
 }
 
