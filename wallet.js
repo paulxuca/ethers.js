@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -73,31 +73,39 @@ var Wallet = /** @class */ (function (_super) {
         errors.checkNew(_this, Wallet);
         // Make sure we have a valid signing key
         if (signing_key_1.SigningKey.isSigningKey(privateKey)) {
-            properties_1.defineReadOnly(_this, 'signingKey', privateKey);
+            properties_1.defineReadOnly(_this, "signingKey", privateKey);
         }
         else {
-            properties_1.defineReadOnly(_this, 'signingKey', new signing_key_1.SigningKey(privateKey));
+            properties_1.defineReadOnly(_this, "signingKey", new signing_key_1.SigningKey(privateKey));
         }
-        properties_1.defineReadOnly(_this, 'provider', provider);
+        properties_1.defineReadOnly(_this, "provider", provider);
         return _this;
     }
     Object.defineProperty(Wallet.prototype, "address", {
-        get: function () { return this.signingKey.address; },
+        get: function () {
+            return this.signingKey.address;
+        },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(Wallet.prototype, "mnemonic", {
-        get: function () { return this.signingKey.mnemonic; },
+        get: function () {
+            return this.signingKey.mnemonic;
+        },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(Wallet.prototype, "path", {
-        get: function () { return this.signingKey.path; },
+        get: function () {
+            return this.signingKey.path;
+        },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(Wallet.prototype, "privateKey", {
-        get: function () { return this.signingKey.privateKey; },
+        get: function () {
+            return this.signingKey.privateKey;
+        },
         enumerable: true,
         configurable: true
     });
@@ -105,8 +113,11 @@ var Wallet = /** @class */ (function (_super) {
      *  Create a new instance of this Wallet connected to provider.
      */
     Wallet.prototype.connect = function (provider) {
-        if (!(abstract_provider_1.Provider.isProvider(provider))) {
-            errors.throwError('invalid provider', errors.INVALID_ARGUMENT, { argument: 'provider', value: provider });
+        if (!abstract_provider_1.Provider.isProvider(provider)) {
+            errors.throwError("invalid provider", errors.INVALID_ARGUMENT, {
+                argument: "provider",
+                value: provider
+            });
         }
         return new Wallet(this.signingKey, provider);
     };
@@ -126,20 +137,20 @@ var Wallet = /** @class */ (function (_super) {
     };
     Wallet.prototype.getBalance = function (blockTag) {
         if (!this.provider) {
-            throw new Error('missing provider');
+            throw new Error("missing provider");
         }
         return this.provider.getBalance(this.address, blockTag);
     };
     Wallet.prototype.getTransactionCount = function (blockTag) {
         if (!this.provider) {
-            throw new Error('missing provider');
+            throw new Error("missing provider");
         }
         return this.provider.getTransactionCount(this.address, blockTag);
     };
     Wallet.prototype.sendTransaction = function (transaction) {
         var _this = this;
         if (!this.provider) {
-            throw new Error('missing provider');
+            throw new Error("missing provider");
         }
         if (transaction.nonce == null) {
             transaction = properties_1.shallowCopy(transaction);
@@ -152,12 +163,12 @@ var Wallet = /** @class */ (function (_super) {
         });
     };
     Wallet.prototype.encrypt = function (password, options, progressCallback) {
-        if (typeof (options) === 'function' && !progressCallback) {
+        if (typeof options === "function" && !progressCallback) {
             progressCallback = options;
             options = {};
         }
-        if (progressCallback && typeof (progressCallback) !== 'function') {
-            throw new Error('invalid callback');
+        if (progressCallback && typeof progressCallback !== "function") {
+            throw new Error("invalid callback");
         }
         if (!options) {
             options = {};
@@ -211,21 +222,34 @@ var Wallet = /** @class */ (function (_super) {
                     case 4: return [3 /*break*/, 6];
                     case 5:
                         if (json_wallet_1.isSecretStorageWallet(json)) {
-                            return [2 /*return*/, secretStorage.decrypt(json, password, progressCallback).then(function (signingKey) {
+                            return [2 /*return*/, secretStorage
+                                    .decrypt(json, password, progressCallback)
+                                    .then(function (signingKey) {
                                     return new Wallet(signingKey);
                                 })];
                         }
                         _a.label = 6;
-                    case 6: return [2 /*return*/, Promise.reject('invalid wallet JSON')];
+                    case 6: return [2 /*return*/, Promise.reject("invalid wallet JSON")];
                 }
             });
         });
     };
     Wallet.fromMnemonic = function (mnemonic, path, wordlist) {
-        if (!path) {
-            path = hdnode_1.defaultPath;
-        }
-        return new Wallet(hdnode_1.fromMnemonic(mnemonic, wordlist).derivePath(path));
+        return __awaiter(this, void 0, void 0, function () {
+            var privateKey;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!path) {
+                            path = hdnode_1.defaultPath;
+                        }
+                        return [4 /*yield*/, hdnode_1.fromMnemonic(mnemonic, wordlist)];
+                    case 1:
+                        privateKey = (_a.sent()).derivePath(path);
+                        return [2 /*return*/, new Wallet(privateKey)];
+                }
+            });
+        });
     };
     return Wallet;
 }(abstract_signer_1.Signer));

@@ -1,12 +1,12 @@
-import { BigNumber } from './utils/bignumber';
-import { HDNode } from './utils/hdnode';
-import { SigningKey } from './utils/signing-key';
-import { Wordlist } from './utils/wordlist';
-import { Signer as AbstractSigner } from './abstract-signer';
-import { Provider } from './providers/abstract-provider';
-import { ProgressCallback } from './utils/secret-storage';
-import { Arrayish } from './utils/bytes';
-import { BlockTag, TransactionRequest, TransactionResponse } from './providers/abstract-provider';
+import { BigNumber } from "./utils/bignumber";
+import { HDNode } from "./utils/hdnode";
+import { SigningKey } from "./utils/signing-key";
+import { Wordlist } from "./utils/wordlist";
+import { Signer as AbstractSigner } from "./abstract-signer";
+import { Provider } from "./providers/abstract-provider";
+import { ProgressCallback } from "./utils/secret-storage";
+import { Arrayish } from "./utils/bytes";
+import { BlockTag, TransactionRequest, TransactionResponse } from "./providers/abstract-provider";
 export declare class Wallet extends AbstractSigner {
     readonly provider: Provider;
     private readonly signingKey;
@@ -29,7 +29,7 @@ export declare class Wallet extends AbstractSigner {
     /**
      *  Static methods to create Wallet instances.
      */
-    static createRandom(options?: any): Wallet;
+    static createRandom(options?: any): Promise<Wallet>;
     static fromEncryptedJson(json: string, password: Arrayish, progressCallback?: ProgressCallback): Promise<Wallet>;
-    static fromMnemonic(mnemonic: string, path?: string, wordlist?: Wordlist): Wallet;
+    static fromMnemonic(mnemonic: string, path?: string, wordlist?: Wordlist): Promise<Wallet>;
 }

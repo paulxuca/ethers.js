@@ -14058,13 +14058,51 @@ function hashMessage(message) {
 exports.hashMessage = hashMessage;
 
 },{"../errors":5,"./bytes":74,"./keccak256":81,"./utf8":96}],76:[function(require,module,exports){
-'use strict';
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
     if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
     result["default"] = mod;
     return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 // See: https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki
@@ -14079,14 +14117,14 @@ var lang_en_1 = require("../wordlists/lang-en");
 var bytes_1 = require("./bytes");
 var bignumber_1 = require("./bignumber");
 var utf8_1 = require("./utf8");
-var pbkdf2_1 = require("./pbkdf2");
 var hmac_1 = require("./hmac");
 var properties_1 = require("./properties");
 var secp256k1_1 = require("./secp256k1");
 var sha2_1 = require("./sha2");
 var N = bignumber_1.bigNumberify("0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141");
+var libraries_1 = __importDefault(require("./libraries"));
 // "Bitcoin seed"
-var MasterSecret = utf8_1.toUtf8Bytes('Bitcoin seed');
+var MasterSecret = utf8_1.toUtf8Bytes("Bitcoin seed");
 var HardenedBit = 0x80000000;
 // Returns a byte with the MSB bits set
 function getUpperMask(bits) {
@@ -14109,33 +14147,33 @@ var HDNode = /** @class */ (function () {
     function HDNode(constructorGuard, privateKey, chainCode, index, depth, mnemonic, path) {
         errors.checkNew(this, HDNode);
         if (constructorGuard !== _constructorGuard) {
-            throw new Error('HDNode constructor cannot be called directly');
+            throw new Error("HDNode constructor cannot be called directly");
         }
-        properties_1.defineReadOnly(this, 'keyPair', new secp256k1_1.KeyPair(privateKey));
-        properties_1.defineReadOnly(this, 'privateKey', this.keyPair.privateKey);
-        properties_1.defineReadOnly(this, 'publicKey', this.keyPair.compressedPublicKey);
-        properties_1.defineReadOnly(this, 'address', secp256k1_1.computeAddress(this.publicKey));
-        properties_1.defineReadOnly(this, 'chainCode', bytes_1.hexlify(chainCode));
-        properties_1.defineReadOnly(this, 'index', index);
-        properties_1.defineReadOnly(this, 'depth', depth);
-        properties_1.defineReadOnly(this, 'mnemonic', mnemonic);
-        properties_1.defineReadOnly(this, 'path', path);
-        properties_1.setType(this, 'HDNode');
+        properties_1.defineReadOnly(this, "keyPair", new secp256k1_1.KeyPair(privateKey));
+        properties_1.defineReadOnly(this, "privateKey", this.keyPair.privateKey);
+        properties_1.defineReadOnly(this, "publicKey", this.keyPair.compressedPublicKey);
+        properties_1.defineReadOnly(this, "address", secp256k1_1.computeAddress(this.publicKey));
+        properties_1.defineReadOnly(this, "chainCode", bytes_1.hexlify(chainCode));
+        properties_1.defineReadOnly(this, "index", index);
+        properties_1.defineReadOnly(this, "depth", depth);
+        properties_1.defineReadOnly(this, "mnemonic", mnemonic);
+        properties_1.defineReadOnly(this, "path", path);
+        properties_1.setType(this, "HDNode");
     }
     HDNode.prototype._derive = function (index) {
         // Public parent key -> public child key
         if (!this.privateKey) {
             if (index >= HardenedBit) {
-                throw new Error('cannot derive child of neutered node');
+                throw new Error("cannot derive child of neutered node");
             }
-            throw new Error('not implemented');
+            throw new Error("not implemented");
         }
         var data = new Uint8Array(37);
         // Base path
         var mnemonic = this.mnemonic;
         var path = this.path;
         if (path) {
-            path += '/' + (index & ~HardenedBit);
+            path += "/" + (index & ~HardenedBit);
         }
         if (index & HardenedBit) {
             // Data = 0x00 || ser_256(k_par)
@@ -14151,7 +14189,7 @@ var HDNode = /** @class */ (function () {
         }
         // Data += ser_32(i)
         for (var i = 24; i >= 0; i -= 8) {
-            data[33 + (i >> 3)] = ((index >> (24 - i)) & 0xff);
+            data[33 + (i >> 3)] = (index >> (24 - i)) & 0xff;
         }
         var I = hmac_1.computeHmac(hmac_1.SupportedAlgorithms.sha512, this.chainCode, data);
         var IL = bignumber_1.bigNumberify(I.slice(0, 32));
@@ -14160,11 +14198,12 @@ var HDNode = /** @class */ (function () {
         return new HDNode(_constructorGuard, bytes_1.arrayify(ki), IR, index, this.depth + 1, mnemonic, path);
     };
     HDNode.prototype.derivePath = function (path) {
-        var components = path.split('/');
-        if (components.length === 0 || (components[0] === 'm' && this.depth !== 0)) {
-            throw new Error('invalid path');
+        var components = path.split("/");
+        if (components.length === 0 ||
+            (components[0] === "m" && this.depth !== 0)) {
+            throw new Error("invalid path");
         }
-        if (components[0] === 'm') {
+        if (components[0] === "m") {
             components.shift();
         }
         var result = this;
@@ -14173,25 +14212,25 @@ var HDNode = /** @class */ (function () {
             if (component.match(/^[0-9]+'$/)) {
                 var index = parseInt(component.substring(0, component.length - 1));
                 if (index >= HardenedBit) {
-                    throw new Error('invalid path index - ' + component);
+                    throw new Error("invalid path index - " + component);
                 }
                 result = result._derive(HardenedBit + index);
             }
             else if (component.match(/^[0-9]+$/)) {
                 var index = parseInt(component);
                 if (index >= HardenedBit) {
-                    throw new Error('invalid path index - ' + component);
+                    throw new Error("invalid path index - " + component);
                 }
                 result = result._derive(index);
             }
             else {
-                throw new Error('invlaid path component - ' + component);
+                throw new Error("invlaid path component - " + component);
             }
         }
         return result;
     };
     HDNode.isHDNode = function (value) {
-        return properties_1.isType(value, 'HDNode');
+        return properties_1.isType(value, "HDNode");
     };
     return HDNode;
 }());
@@ -14199,15 +14238,26 @@ exports.HDNode = HDNode;
 function _fromSeed(seed, mnemonic) {
     var seedArray = bytes_1.arrayify(seed);
     if (seedArray.length < 16 || seedArray.length > 64) {
-        throw new Error('invalid seed');
+        throw new Error("invalid seed");
     }
     var I = bytes_1.arrayify(hmac_1.computeHmac(hmac_1.SupportedAlgorithms.sha512, MasterSecret, seedArray));
-    return new HDNode(_constructorGuard, I.slice(0, 32), I.slice(32), 0, 0, mnemonic, 'm');
+    return new HDNode(_constructorGuard, I.slice(0, 32), I.slice(32), 0, 0, mnemonic, "m");
 }
 function fromMnemonic(mnemonic, wordlist) {
-    // Check that the checksum s valid (will throw an error)
-    mnemonicToEntropy(mnemonic, wordlist);
-    return _fromSeed(mnemonicToSeed(mnemonic), mnemonic);
+    return __awaiter(this, void 0, void 0, function () {
+        var seed;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    // Check that the checksum s valid (will throw an error)
+                    mnemonicToEntropy(mnemonic, wordlist);
+                    return [4 /*yield*/, mnemonicToSeed(mnemonic)];
+                case 1:
+                    seed = _a.sent();
+                    return [2 /*return*/, _fromSeed(seed, mnemonic)];
+            }
+        });
+    });
 }
 exports.fromMnemonic = fromMnemonic;
 function fromSeed(seed) {
@@ -14215,11 +14265,22 @@ function fromSeed(seed) {
 }
 exports.fromSeed = fromSeed;
 function mnemonicToSeed(mnemonic, password) {
-    if (!password) {
-        password = '';
-    }
-    var salt = utf8_1.toUtf8Bytes('mnemonic' + password, utf8_1.UnicodeNormalizationForm.NFKD);
-    return bytes_1.hexlify(pbkdf2_1.pbkdf2(utf8_1.toUtf8Bytes(mnemonic, utf8_1.UnicodeNormalizationForm.NFKD), salt, 2048, 64, 'sha512'));
+    return __awaiter(this, void 0, void 0, function () {
+        var salt, buf;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    if (!password) {
+                        password = "";
+                    }
+                    salt = utf8_1.toUtf8Bytes("mnemonic" + password, utf8_1.UnicodeNormalizationForm.NFKD);
+                    return [4 /*yield*/, libraries_1.default.pbkdf2(utf8_1.toUtf8Bytes(mnemonic, utf8_1.UnicodeNormalizationForm.NFKD), salt, 2048, 64, "sha512")];
+                case 1:
+                    buf = _a.sent();
+                    return [2 /*return*/, bytes_1.hexlify(buf)];
+            }
+        });
+    });
 }
 exports.mnemonicToSeed = mnemonicToSeed;
 function mnemonicToEntropy(mnemonic, wordlist) {
@@ -14228,38 +14289,38 @@ function mnemonicToEntropy(mnemonic, wordlist) {
     }
     errors.checkNormalize();
     var words = wordlist.split(mnemonic);
-    if ((words.length % 3) !== 0) {
-        throw new Error('invalid mnemonic');
+    if (words.length % 3 !== 0) {
+        throw new Error("invalid mnemonic");
     }
-    var entropy = bytes_1.arrayify(new Uint8Array(Math.ceil(11 * words.length / 8)));
+    var entropy = bytes_1.arrayify(new Uint8Array(Math.ceil((11 * words.length) / 8)));
     var offset = 0;
     for (var i = 0; i < words.length; i++) {
-        var index = wordlist.getWordIndex(words[i].normalize('NFKD'));
+        var index = wordlist.getWordIndex(words[i].normalize("NFKD"));
         if (index === -1) {
-            throw new Error('invalid mnemonic');
+            throw new Error("invalid mnemonic");
         }
         for (var bit = 0; bit < 11; bit++) {
             if (index & (1 << (10 - bit))) {
-                entropy[offset >> 3] |= (1 << (7 - (offset % 8)));
+                entropy[offset >> 3] |= 1 << (7 - (offset % 8));
             }
             offset++;
         }
     }
-    var entropyBits = 32 * words.length / 3;
+    var entropyBits = (32 * words.length) / 3;
     var checksumBits = words.length / 3;
     var checksumMask = getUpperMask(checksumBits);
     var checksum = bytes_1.arrayify(sha2_1.sha256(entropy.slice(0, entropyBits / 8)))[0];
     checksum &= checksumMask;
     if (checksum !== (entropy[entropy.length - 1] & checksumMask)) {
-        throw new Error('invalid checksum');
+        throw new Error("invalid checksum");
     }
     return bytes_1.hexlify(entropy.slice(0, entropyBits / 8));
 }
 exports.mnemonicToEntropy = mnemonicToEntropy;
 function entropyToMnemonic(entropy, wordlist) {
     entropy = bytes_1.arrayify(entropy);
-    if ((entropy.length % 4) !== 0 || entropy.length < 16 || entropy.length > 32) {
-        throw new Error('invalid entropy');
+    if (entropy.length % 4 !== 0 || entropy.length < 16 || entropy.length > 32) {
+        throw new Error("invalid entropy");
     }
     var indices = [0];
     var remainingBits = 11;
@@ -14285,7 +14346,7 @@ function entropyToMnemonic(entropy, wordlist) {
     checksum &= getUpperMask(checksumBits);
     // Shift the checksum into the word indices
     indices[indices.length - 1] <<= checksumBits;
-    indices[indices.length - 1] |= (checksum >> (8 - checksumBits));
+    indices[indices.length - 1] |= checksum >> (8 - checksumBits);
     if (!wordlist) {
         wordlist = lang_en_1.langEn;
     }
@@ -14302,7 +14363,7 @@ function isValidMnemonic(mnemonic, wordlist) {
 }
 exports.isValidMnemonic = isValidMnemonic;
 
-},{"../errors":5,"../wordlists/lang-en":101,"./bignumber":73,"./bytes":74,"./hmac":77,"./pbkdf2":84,"./properties":85,"./secp256k1":88,"./sha2":90,"./utf8":96}],77:[function(require,module,exports){
+},{"../errors":5,"../wordlists/lang-en":101,"./bignumber":73,"./bytes":74,"./hmac":77,"./libraries":82,"./properties":85,"./secp256k1":88,"./sha2":90,"./utf8":96}],77:[function(require,module,exports){
 "use strict";
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
@@ -15060,49 +15121,51 @@ function getNetwork(network) {
 exports.getNetwork = getNetwork;
 
 },{"../errors":5}],84:[function(require,module,exports){
-'use strict';
+"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var bytes_1 = require("../utils/bytes");
 var hmac_1 = require("./hmac");
 function pbkdf2(password, salt, iterations, keylen, hashAlgorithm) {
-    password = bytes_1.arrayify(password);
-    salt = bytes_1.arrayify(salt);
-    var hLen;
-    var l = 1;
-    var DK = new Uint8Array(keylen);
-    var block1 = new Uint8Array(salt.length + 4);
-    block1.set(salt);
-    //salt.copy(block1, 0, 0, salt.length)
-    var r;
-    var T;
-    for (var i = 1; i <= l; i++) {
-        //block1.writeUInt32BE(i, salt.length)
-        block1[salt.length] = (i >> 24) & 0xff;
-        block1[salt.length + 1] = (i >> 16) & 0xff;
-        block1[salt.length + 2] = (i >> 8) & 0xff;
-        block1[salt.length + 3] = i & 0xff;
-        //var U = createHmac(password).update(block1).digest();
-        var U = hmac_1.computeHmac(hashAlgorithm, password, block1);
-        if (!hLen) {
-            hLen = U.length;
-            T = new Uint8Array(hLen);
-            l = Math.ceil(keylen / hLen);
-            r = keylen - (l - 1) * hLen;
+    return new Promise(function (resolve) {
+        password = bytes_1.arrayify(password);
+        salt = bytes_1.arrayify(salt);
+        var hLen;
+        var l = 1;
+        var DK = new Uint8Array(keylen);
+        var block1 = new Uint8Array(salt.length + 4);
+        block1.set(salt);
+        //salt.copy(block1, 0, 0, salt.length)
+        var r;
+        var T;
+        for (var i = 1; i <= l; i++) {
+            //block1.writeUInt32BE(i, salt.length)
+            block1[salt.length] = (i >> 24) & 0xff;
+            block1[salt.length + 1] = (i >> 16) & 0xff;
+            block1[salt.length + 2] = (i >> 8) & 0xff;
+            block1[salt.length + 3] = i & 0xff;
+            //var U = createHmac(password).update(block1).digest();
+            var U = hmac_1.computeHmac(hashAlgorithm, password, block1);
+            if (!hLen) {
+                hLen = U.length;
+                T = new Uint8Array(hLen);
+                l = Math.ceil(keylen / hLen);
+                r = keylen - (l - 1) * hLen;
+            }
+            //U.copy(T, 0, 0, hLen)
+            T.set(U);
+            for (var j = 1; j < iterations; j++) {
+                //U = createHmac(password).update(U).digest();
+                U = hmac_1.computeHmac(hashAlgorithm, password, U);
+                for (var k = 0; k < hLen; k++)
+                    T[k] ^= U[k];
+            }
+            var destPos = (i - 1) * hLen;
+            var len = i === l ? r : hLen;
+            //T.copy(DK, destPos, 0, len)
+            DK.set(bytes_1.arrayify(T).slice(0, len), destPos);
         }
-        //U.copy(T, 0, 0, hLen)
-        T.set(U);
-        for (var j = 1; j < iterations; j++) {
-            //U = createHmac(password).update(U).digest();
-            U = hmac_1.computeHmac(hashAlgorithm, password, U);
-            for (var k = 0; k < hLen; k++)
-                T[k] ^= U[k];
-        }
-        var destPos = (i - 1) * hLen;
-        var len = (i === l ? r : hLen);
-        //T.copy(DK, destPos, 0, len)
-        DK.set(bytes_1.arrayify(T).slice(0, len), destPos);
-    }
-    return bytes_1.arrayify(DK);
+        resolve(bytes_1.arrayify(DK));
+    });
 }
 exports.pbkdf2 = pbkdf2;
 
@@ -15503,7 +15566,7 @@ function verifyMessage(message, signature) {
 exports.verifyMessage = verifyMessage;
 
 },{"../errors":5,"./address":71,"./bytes":74,"./hash":75,"./keccak256":81,"./properties":85,"elliptic":12}],89:[function(require,module,exports){
-'use strict';
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -15562,20 +15625,20 @@ var keccak256_1 = require("./keccak256");
 var utf8_1 = require("./utf8");
 var random_bytes_1 = require("./random-bytes");
 function looseArrayify(hexString) {
-    if (typeof (hexString) === 'string' && hexString.substring(0, 2) !== '0x') {
-        hexString = '0x' + hexString;
+    if (typeof hexString === "string" && hexString.substring(0, 2) !== "0x") {
+        hexString = "0x" + hexString;
     }
     return bytes_1.arrayify(hexString);
 }
 function zpad(value, length) {
     value = String(value);
     while (value.length < length) {
-        value = '0' + value;
+        value = "0" + value;
     }
     return value;
 }
 function getPassword(password) {
-    if (typeof (password) === 'string') {
+    if (typeof password === "string") {
         return utf8_1.toUtf8Bytes(password, utf8_1.UnicodeNormalizationForm.NFKC);
     }
     return bytes_1.arrayify(password);
@@ -15583,7 +15646,7 @@ function getPassword(password) {
 // Search an Object and its children recursively, caselessly.
 function searchPath(object, path) {
     var currentChild = object;
-    var comps = path.toLowerCase().split('/');
+    var comps = path.toLowerCase().split("/");
     for (var i = 0; i < comps.length; i++) {
         // Search for a child object with a case-insensitive matching key
         var matchingChild = null;
@@ -15608,29 +15671,34 @@ function decryptCrowdsale(json, password) {
     return __awaiter(this, void 0, void 0, function () {
         var data, ethaddr, encseed, key, iv, encryptedSeed, aesCbc, seed, seedHex, i, seedHexBytes, signingKey;
         return __generator(this, function (_a) {
-            data = JSON.parse(json);
-            password = getPassword(password);
-            ethaddr = address_1.getAddress(searchPath(data, 'ethaddr'));
-            encseed = looseArrayify(searchPath(data, 'encseed'));
-            if (!encseed || (encseed.length % 16) !== 0) {
-                throw new Error('invalid encseed');
+            switch (_a.label) {
+                case 0:
+                    data = JSON.parse(json);
+                    password = getPassword(password);
+                    ethaddr = address_1.getAddress(searchPath(data, "ethaddr"));
+                    encseed = looseArrayify(searchPath(data, "encseed"));
+                    if (!encseed || encseed.length % 16 !== 0) {
+                        throw new Error("invalid encseed");
+                    }
+                    return [4 /*yield*/, pbkdf2_1.pbkdf2(password, password, 2000, 32, "sha256")];
+                case 1:
+                    key = (_a.sent()).slice(0, 16);
+                    iv = encseed.slice(0, 16);
+                    encryptedSeed = encseed.slice(16);
+                    aesCbc = new aes_js_1.default.ModeOfOperation.cbc(key, iv);
+                    seed = bytes_1.arrayify(aesCbc.decrypt(encryptedSeed));
+                    seed = aes_js_1.default.padding.pkcs7.strip(seed);
+                    seedHex = "";
+                    for (i = 0; i < seed.length; i++) {
+                        seedHex += String.fromCharCode(seed[i]);
+                    }
+                    seedHexBytes = utf8_1.toUtf8Bytes(seedHex);
+                    signingKey = new signing_key_1.SigningKey(keccak256_1.keccak256(seedHexBytes));
+                    if (signingKey.address !== ethaddr) {
+                        throw new Error("corrupt crowdsale wallet");
+                    }
+                    return [2 /*return*/, signingKey];
             }
-            key = pbkdf2_1.pbkdf2(password, password, 2000, 32, 'sha256').slice(0, 16);
-            iv = encseed.slice(0, 16);
-            encryptedSeed = encseed.slice(16);
-            aesCbc = new aes_js_1.default.ModeOfOperation.cbc(key, iv);
-            seed = bytes_1.arrayify(aesCbc.decrypt(encryptedSeed));
-            seed = aes_js_1.default.padding.pkcs7.strip(seed);
-            seedHex = '';
-            for (i = 0; i < seed.length; i++) {
-                seedHex += String.fromCharCode(seed[i]);
-            }
-            seedHexBytes = utf8_1.toUtf8Bytes(seedHex);
-            signingKey = new signing_key_1.SigningKey(keccak256_1.keccak256(seedHexBytes));
-            if (signingKey.address !== ethaddr) {
-                throw new Error('corrupt crowdsale wallet');
-            }
-            return [2 /*return*/, signingKey];
         });
     });
 }
@@ -15640,9 +15708,9 @@ function decrypt(json, password, progressCallback) {
     var data = JSON.parse(json);
     var passwordBytes = getPassword(password);
     var decrypt = function (key, ciphertext) {
-        var cipher = searchPath(data, 'crypto/cipher');
-        if (cipher === 'aes-128-ctr') {
-            var iv = looseArrayify(searchPath(data, 'crypto/cipherparams/iv'));
+        var cipher = searchPath(data, "crypto/cipher");
+        if (cipher === "aes-128-ctr") {
+            var iv = looseArrayify(searchPath(data, "crypto/cipherparams/iv"));
             var counter = new aes_js_1.default.Counter(iv);
             var aesCtr = new aes_js_1.default.ModeOfOperation.ctr(key, counter);
             return bytes_1.arrayify(aesCtr.decrypt(ciphertext));
@@ -15653,128 +15721,165 @@ function decrypt(json, password, progressCallback) {
         return keccak256_1.keccak256(bytes_1.concat([derivedHalf, ciphertext]));
     };
     var getSigningKey = function (key, reject) {
-        var ciphertext = looseArrayify(searchPath(data, 'crypto/ciphertext'));
-        var computedMAC = bytes_1.hexlify(computeMAC(key.slice(16, 32), ciphertext)).substring(2);
-        if (computedMAC !== searchPath(data, 'crypto/mac').toLowerCase()) {
-            reject(new Error('invalid password'));
-            return null;
-        }
-        var privateKey = decrypt(key.slice(0, 16), ciphertext);
-        var mnemonicKey = key.slice(32, 64);
-        if (!privateKey) {
-            reject(new Error('unsupported cipher'));
-            return null;
-        }
-        var signingKey = new signing_key_1.SigningKey(privateKey);
-        if (signingKey.address !== address_1.getAddress(data.address)) {
-            reject(new Error('address mismatch'));
-            return null;
-        }
-        // Version 0.1 x-ethers metadata must contain an encrypted mnemonic phrase
-        if (searchPath(data, 'x-ethers/version') === '0.1') {
-            var mnemonicCiphertext = looseArrayify(searchPath(data, 'x-ethers/mnemonicCiphertext'));
-            var mnemonicIv = looseArrayify(searchPath(data, 'x-ethers/mnemonicCounter'));
-            var mnemonicCounter = new aes_js_1.default.Counter(mnemonicIv);
-            var mnemonicAesCtr = new aes_js_1.default.ModeOfOperation.ctr(mnemonicKey, mnemonicCounter);
-            var path = searchPath(data, 'x-ethers/path') || HDNode.defaultPath;
-            var entropy = bytes_1.arrayify(mnemonicAesCtr.decrypt(mnemonicCiphertext));
-            var mnemonic = HDNode.entropyToMnemonic(entropy);
-            var node = HDNode.fromMnemonic(mnemonic).derivePath(path);
-            if (node.privateKey != bytes_1.hexlify(privateKey)) {
-                reject(new Error('mnemonic mismatch'));
-                return null;
-            }
-            signingKey = new signing_key_1.SigningKey(node);
-        }
-        return signingKey;
+        return __awaiter(this, void 0, void 0, function () {
+            var ciphertext, computedMAC, privateKey, mnemonicKey, signingKey, mnemonicCiphertext, mnemonicIv, mnemonicCounter, mnemonicAesCtr, path, entropy, mnemonic, node;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        ciphertext = looseArrayify(searchPath(data, "crypto/ciphertext"));
+                        computedMAC = bytes_1.hexlify(computeMAC(key.slice(16, 32), ciphertext)).substring(2);
+                        if (computedMAC !== searchPath(data, "crypto/mac").toLowerCase()) {
+                            reject(new Error("invalid password"));
+                            return [2 /*return*/, null];
+                        }
+                        privateKey = decrypt(key.slice(0, 16), ciphertext);
+                        mnemonicKey = key.slice(32, 64);
+                        if (!privateKey) {
+                            reject(new Error("unsupported cipher"));
+                            return [2 /*return*/, null];
+                        }
+                        signingKey = new signing_key_1.SigningKey(privateKey);
+                        if (signingKey.address !== address_1.getAddress(data.address)) {
+                            reject(new Error("address mismatch"));
+                            return [2 /*return*/, null];
+                        }
+                        if (!(searchPath(data, "x-ethers/version") === "0.1")) return [3 /*break*/, 2];
+                        mnemonicCiphertext = looseArrayify(searchPath(data, "x-ethers/mnemonicCiphertext"));
+                        mnemonicIv = looseArrayify(searchPath(data, "x-ethers/mnemonicCounter"));
+                        mnemonicCounter = new aes_js_1.default.Counter(mnemonicIv);
+                        mnemonicAesCtr = new aes_js_1.default.ModeOfOperation.ctr(mnemonicKey, mnemonicCounter);
+                        path = searchPath(data, "x-ethers/path") || HDNode.defaultPath;
+                        entropy = bytes_1.arrayify(mnemonicAesCtr.decrypt(mnemonicCiphertext));
+                        mnemonic = HDNode.entropyToMnemonic(entropy);
+                        return [4 /*yield*/, HDNode.fromMnemonic(mnemonic)];
+                    case 1:
+                        node = (_a.sent()).derivePath(path);
+                        if (node.privateKey != bytes_1.hexlify(privateKey)) {
+                            reject(new Error("mnemonic mismatch"));
+                            return [2 /*return*/, null];
+                        }
+                        signingKey = new signing_key_1.SigningKey(node);
+                        _a.label = 2;
+                    case 2: return [2 /*return*/, signingKey];
+                }
+            });
+        });
     };
     return new Promise(function (resolve, reject) {
-        var kdf = searchPath(data, 'crypto/kdf');
-        if (kdf && typeof (kdf) === 'string') {
-            if (kdf.toLowerCase() === 'scrypt') {
-                var salt = looseArrayify(searchPath(data, 'crypto/kdfparams/salt'));
-                var N = parseInt(searchPath(data, 'crypto/kdfparams/n'));
-                var r = parseInt(searchPath(data, 'crypto/kdfparams/r'));
-                var p = parseInt(searchPath(data, 'crypto/kdfparams/p'));
-                if (!N || !r || !p) {
-                    reject(new Error('unsupported key-derivation function parameters'));
-                    return;
-                }
-                // Make sure N is a power of 2
-                if ((N & (N - 1)) !== 0) {
-                    reject(new Error('unsupported key-derivation function parameter value for N'));
-                    return;
-                }
-                var dkLen = parseInt(searchPath(data, 'crypto/kdfparams/dklen'));
-                if (dkLen !== 32) {
-                    reject(new Error('unsupported key-derivation derived-key length'));
-                    return;
-                }
-                if (progressCallback) {
-                    progressCallback(0);
-                }
-                var scrypt = libraries_1.default.scrypt;
-                scrypt(passwordBytes, salt, N, r, p, 64, function (error, progress, key) {
-                    if (error) {
-                        error.progress = progress;
-                        reject(error);
-                    }
-                    else if (key) {
-                        key = bytes_1.arrayify(key);
-                        var signingKey = getSigningKey(key, reject);
-                        if (!signingKey) {
-                            return;
+        return __awaiter(this, void 0, void 0, function () {
+            var kdf, salt, N, r, p, dkLen, scrypt, salt, prfFunc, prf, c, dkLen, key, signingKey;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        kdf = searchPath(data, "crypto/kdf");
+                        if (!(kdf && typeof kdf === "string")) return [3 /*break*/, 6];
+                        if (!(kdf.toLowerCase() === "scrypt")) return [3 /*break*/, 1];
+                        salt = looseArrayify(searchPath(data, "crypto/kdfparams/salt"));
+                        N = parseInt(searchPath(data, "crypto/kdfparams/n"));
+                        r = parseInt(searchPath(data, "crypto/kdfparams/r"));
+                        p = parseInt(searchPath(data, "crypto/kdfparams/p"));
+                        if (!N || !r || !p) {
+                            reject(new Error("unsupported key-derivation function parameters"));
+                            return [2 /*return*/];
+                        }
+                        // Make sure N is a power of 2
+                        if ((N & (N - 1)) !== 0) {
+                            reject(new Error("unsupported key-derivation function parameter value for N"));
+                            return [2 /*return*/];
+                        }
+                        dkLen = parseInt(searchPath(data, "crypto/kdfparams/dklen"));
+                        if (dkLen !== 32) {
+                            reject(new Error("unsupported key-derivation derived-key length"));
+                            return [2 /*return*/];
                         }
                         if (progressCallback) {
-                            progressCallback(1);
+                            progressCallback(0);
+                        }
+                        scrypt = libraries_1.default.scrypt;
+                        scrypt(passwordBytes, salt, N, r, p, 64, function (error, progress, key) {
+                            return __awaiter(this, void 0, void 0, function () {
+                                var signingKey;
+                                return __generator(this, function (_a) {
+                                    switch (_a.label) {
+                                        case 0:
+                                            if (!error) return [3 /*break*/, 1];
+                                            error.progress = progress;
+                                            reject(error);
+                                            return [3 /*break*/, 4];
+                                        case 1:
+                                            if (!key) return [3 /*break*/, 3];
+                                            key = bytes_1.arrayify(key);
+                                            return [4 /*yield*/, getSigningKey(key, reject)];
+                                        case 2:
+                                            signingKey = _a.sent();
+                                            if (!signingKey) {
+                                                return [2 /*return*/];
+                                            }
+                                            if (progressCallback) {
+                                                progressCallback(1);
+                                            }
+                                            resolve(signingKey);
+                                            return [3 /*break*/, 4];
+                                        case 3:
+                                            if (progressCallback) {
+                                                return [2 /*return*/, progressCallback(progress)];
+                                            }
+                                            _a.label = 4;
+                                        case 4: return [2 /*return*/];
+                                    }
+                                });
+                            });
+                        });
+                        return [3 /*break*/, 5];
+                    case 1:
+                        if (!(kdf.toLowerCase() === "pbkdf2")) return [3 /*break*/, 4];
+                        salt = looseArrayify(searchPath(data, "crypto/kdfparams/salt"));
+                        prfFunc = null;
+                        prf = searchPath(data, "crypto/kdfparams/prf");
+                        if (prf === "hmac-sha256") {
+                            prfFunc = "sha256";
+                        }
+                        else if (prf === "hmac-sha512") {
+                            prfFunc = "sha512";
+                        }
+                        else {
+                            reject(new Error("unsupported prf"));
+                            return [2 /*return*/];
+                        }
+                        c = parseInt(searchPath(data, "crypto/kdfparams/c"));
+                        dkLen = parseInt(searchPath(data, "crypto/kdfparams/dklen"));
+                        if (dkLen !== 32) {
+                            reject(new Error("unsupported key-derivation derived-key length"));
+                            return [2 /*return*/];
+                        }
+                        return [4 /*yield*/, pbkdf2_1.pbkdf2(passwordBytes, salt, c, dkLen, prfFunc)];
+                    case 2:
+                        key = _a.sent();
+                        return [4 /*yield*/, getSigningKey(key, reject)];
+                    case 3:
+                        signingKey = _a.sent();
+                        if (!signingKey) {
+                            return [2 /*return*/];
                         }
                         resolve(signingKey);
-                    }
-                    else if (progressCallback) {
-                        return progressCallback(progress);
-                    }
-                });
-            }
-            else if (kdf.toLowerCase() === 'pbkdf2') {
-                var salt = looseArrayify(searchPath(data, 'crypto/kdfparams/salt'));
-                var prfFunc = null;
-                var prf = searchPath(data, 'crypto/kdfparams/prf');
-                if (prf === 'hmac-sha256') {
-                    prfFunc = 'sha256';
+                        return [3 /*break*/, 5];
+                    case 4:
+                        reject(new Error("unsupported key-derivation function"));
+                        _a.label = 5;
+                    case 5: return [3 /*break*/, 7];
+                    case 6:
+                        reject(new Error("unsupported key-derivation function"));
+                        _a.label = 7;
+                    case 7: return [2 /*return*/];
                 }
-                else if (prf === 'hmac-sha512') {
-                    prfFunc = 'sha512';
-                }
-                else {
-                    reject(new Error('unsupported prf'));
-                    return;
-                }
-                var c = parseInt(searchPath(data, 'crypto/kdfparams/c'));
-                var dkLen = parseInt(searchPath(data, 'crypto/kdfparams/dklen'));
-                if (dkLen !== 32) {
-                    reject(new Error('unsupported key-derivation derived-key length'));
-                    return;
-                }
-                var key = pbkdf2_1.pbkdf2(passwordBytes, salt, c, dkLen, prfFunc);
-                var signingKey = getSigningKey(key, reject);
-                if (!signingKey) {
-                    return;
-                }
-                resolve(signingKey);
-            }
-            else {
-                reject(new Error('unsupported key-derivation function'));
-            }
-        }
-        else {
-            reject(new Error('unsupported key-derivation function'));
-        }
+            });
+        });
     });
 }
 exports.decrypt = decrypt;
 function encrypt(privateKey, password, options, progressCallback) {
     // the options are optional, so adjust the call as needed
-    if (typeof (options) === 'function' && !progressCallback) {
+    if (typeof options === "function" && !progressCallback) {
         progressCallback = options;
         options = {};
     }
@@ -15790,7 +15895,7 @@ function encrypt(privateKey, password, options, progressCallback) {
         privateKeyBytes = bytes_1.arrayify(privateKey);
     }
     if (privateKeyBytes.length !== 32) {
-        throw new Error('invalid private key');
+        throw new Error("invalid private key");
     }
     var passwordBytes = getPassword(password);
     var entropy = null;
@@ -15800,7 +15905,7 @@ function encrypt(privateKey, password, options, progressCallback) {
     if (options.mnemonic) {
         if (entropy) {
             if (HDNode.entropyToMnemonic(entropy) !== options.mnemonic) {
-                throw new Error('entropy and mnemonic mismatch');
+                throw new Error("entropy and mnemonic mismatch");
             }
         }
         else {
@@ -15822,14 +15927,13 @@ function encrypt(privateKey, password, options, progressCallback) {
     }
     else {
         salt = random_bytes_1.randomBytes(32);
-        ;
     }
     // Override initialization vector
     var iv = null;
     if (options.iv) {
         iv = bytes_1.arrayify(options.iv);
         if (iv.length !== 16) {
-            throw new Error('invalid iv');
+            throw new Error("invalid iv");
         }
     }
     else {
@@ -15840,14 +15944,14 @@ function encrypt(privateKey, password, options, progressCallback) {
     if (options.uuid) {
         uuidRandom = bytes_1.arrayify(options.uuid);
         if (uuidRandom.length !== 16) {
-            throw new Error('invalid uuid');
+            throw new Error("invalid uuid");
         }
     }
     else {
         uuidRandom = random_bytes_1.randomBytes(16);
     }
     // Override the scrypt password-based key derivation function parameters
-    var N = (1 << 17), r = 8, p = 1;
+    var N = 1 << 17, r = 8, p = 1;
     if (options.scrypt) {
         if (options.scrypt.N) {
             N = options.scrypt.N;
@@ -15879,7 +15983,7 @@ function encrypt(privateKey, password, options, progressCallback) {
                 // This will be used to encrypt the mnemonic phrase (if any)
                 var mnemonicKey = key.slice(32, 64);
                 // Get the address for this private key
-                var address = (new signing_key_1.SigningKey(privateKeyBytes)).address;
+                var address = new signing_key_1.SigningKey(privateKeyBytes).address;
                 // Encrypt the private key
                 var counter = new aes_js_1.default.Counter(iv);
                 var aesCtr = new aes_js_1.default.ModeOfOperation.ctr(derivedKey, counter);
@@ -15892,12 +15996,12 @@ function encrypt(privateKey, password, options, progressCallback) {
                     id: uuid_1.default.v4({ random: uuidRandom }),
                     version: 3,
                     Crypto: {
-                        cipher: 'aes-128-ctr',
+                        cipher: "aes-128-ctr",
                         cipherparams: {
-                            iv: bytes_1.hexlify(iv).substring(2),
+                            iv: bytes_1.hexlify(iv).substring(2)
                         },
                         ciphertext: bytes_1.hexlify(ciphertext).substring(2),
-                        kdf: 'scrypt',
+                        kdf: "scrypt",
                         kdfparams: {
                             salt: bytes_1.hexlify(salt).substring(2),
                             n: N,
@@ -15915,15 +16019,21 @@ function encrypt(privateKey, password, options, progressCallback) {
                     var mnemonicAesCtr = new aes_js_1.default.ModeOfOperation.ctr(mnemonicKey, mnemonicCounter);
                     var mnemonicCiphertext = bytes_1.arrayify(mnemonicAesCtr.encrypt(entropy));
                     var now = new Date();
-                    var timestamp = (now.getUTCFullYear() + '-' +
-                        zpad(now.getUTCMonth() + 1, 2) + '-' +
-                        zpad(now.getUTCDate(), 2) + 'T' +
-                        zpad(now.getUTCHours(), 2) + '-' +
-                        zpad(now.getUTCMinutes(), 2) + '-' +
-                        zpad(now.getUTCSeconds(), 2) + '.0Z');
-                    data['x-ethers'] = {
+                    var timestamp = now.getUTCFullYear() +
+                        "-" +
+                        zpad(now.getUTCMonth() + 1, 2) +
+                        "-" +
+                        zpad(now.getUTCDate(), 2) +
+                        "T" +
+                        zpad(now.getUTCHours(), 2) +
+                        "-" +
+                        zpad(now.getUTCMinutes(), 2) +
+                        "-" +
+                        zpad(now.getUTCSeconds(), 2) +
+                        ".0Z";
+                    data["x-ethers"] = {
                         client: client,
-                        gethFilename: ('UTC--' + timestamp + '--' + data.address),
+                        gethFilename: "UTC--" + timestamp + "--" + data.address,
                         mnemonicCounter: bytes_1.hexlify(mnemonicIv).substring(2),
                         mnemonicCiphertext: bytes_1.hexlify(mnemonicCiphertext).substring(2),
                         path: path,
@@ -16948,7 +17058,7 @@ exports.register = register;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../utils/hash":75,"../utils/properties":85}],99:[function(require,module,exports){
-'use strict';
+"use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -17023,31 +17133,39 @@ var Wallet = /** @class */ (function (_super) {
         errors.checkNew(_this, Wallet);
         // Make sure we have a valid signing key
         if (signing_key_1.SigningKey.isSigningKey(privateKey)) {
-            properties_1.defineReadOnly(_this, 'signingKey', privateKey);
+            properties_1.defineReadOnly(_this, "signingKey", privateKey);
         }
         else {
-            properties_1.defineReadOnly(_this, 'signingKey', new signing_key_1.SigningKey(privateKey));
+            properties_1.defineReadOnly(_this, "signingKey", new signing_key_1.SigningKey(privateKey));
         }
-        properties_1.defineReadOnly(_this, 'provider', provider);
+        properties_1.defineReadOnly(_this, "provider", provider);
         return _this;
     }
     Object.defineProperty(Wallet.prototype, "address", {
-        get: function () { return this.signingKey.address; },
+        get: function () {
+            return this.signingKey.address;
+        },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(Wallet.prototype, "mnemonic", {
-        get: function () { return this.signingKey.mnemonic; },
+        get: function () {
+            return this.signingKey.mnemonic;
+        },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(Wallet.prototype, "path", {
-        get: function () { return this.signingKey.path; },
+        get: function () {
+            return this.signingKey.path;
+        },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(Wallet.prototype, "privateKey", {
-        get: function () { return this.signingKey.privateKey; },
+        get: function () {
+            return this.signingKey.privateKey;
+        },
         enumerable: true,
         configurable: true
     });
@@ -17055,8 +17173,11 @@ var Wallet = /** @class */ (function (_super) {
      *  Create a new instance of this Wallet connected to provider.
      */
     Wallet.prototype.connect = function (provider) {
-        if (!(abstract_provider_1.Provider.isProvider(provider))) {
-            errors.throwError('invalid provider', errors.INVALID_ARGUMENT, { argument: 'provider', value: provider });
+        if (!abstract_provider_1.Provider.isProvider(provider)) {
+            errors.throwError("invalid provider", errors.INVALID_ARGUMENT, {
+                argument: "provider",
+                value: provider
+            });
         }
         return new Wallet(this.signingKey, provider);
     };
@@ -17076,20 +17197,20 @@ var Wallet = /** @class */ (function (_super) {
     };
     Wallet.prototype.getBalance = function (blockTag) {
         if (!this.provider) {
-            throw new Error('missing provider');
+            throw new Error("missing provider");
         }
         return this.provider.getBalance(this.address, blockTag);
     };
     Wallet.prototype.getTransactionCount = function (blockTag) {
         if (!this.provider) {
-            throw new Error('missing provider');
+            throw new Error("missing provider");
         }
         return this.provider.getTransactionCount(this.address, blockTag);
     };
     Wallet.prototype.sendTransaction = function (transaction) {
         var _this = this;
         if (!this.provider) {
-            throw new Error('missing provider');
+            throw new Error("missing provider");
         }
         if (transaction.nonce == null) {
             transaction = properties_1.shallowCopy(transaction);
@@ -17102,12 +17223,12 @@ var Wallet = /** @class */ (function (_super) {
         });
     };
     Wallet.prototype.encrypt = function (password, options, progressCallback) {
-        if (typeof (options) === 'function' && !progressCallback) {
+        if (typeof options === "function" && !progressCallback) {
             progressCallback = options;
             options = {};
         }
-        if (progressCallback && typeof (progressCallback) !== 'function') {
-            throw new Error('invalid callback');
+        if (progressCallback && typeof progressCallback !== "function") {
+            throw new Error("invalid callback");
         }
         if (!options) {
             options = {};
@@ -17161,21 +17282,34 @@ var Wallet = /** @class */ (function (_super) {
                     case 4: return [3 /*break*/, 6];
                     case 5:
                         if (json_wallet_1.isSecretStorageWallet(json)) {
-                            return [2 /*return*/, secretStorage.decrypt(json, password, progressCallback).then(function (signingKey) {
+                            return [2 /*return*/, secretStorage
+                                    .decrypt(json, password, progressCallback)
+                                    .then(function (signingKey) {
                                     return new Wallet(signingKey);
                                 })];
                         }
                         _a.label = 6;
-                    case 6: return [2 /*return*/, Promise.reject('invalid wallet JSON')];
+                    case 6: return [2 /*return*/, Promise.reject("invalid wallet JSON")];
                 }
             });
         });
     };
     Wallet.fromMnemonic = function (mnemonic, path, wordlist) {
-        if (!path) {
-            path = hdnode_1.defaultPath;
-        }
-        return new Wallet(hdnode_1.fromMnemonic(mnemonic, wordlist).derivePath(path));
+        return __awaiter(this, void 0, void 0, function () {
+            var privateKey;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!path) {
+                            path = hdnode_1.defaultPath;
+                        }
+                        return [4 /*yield*/, hdnode_1.fromMnemonic(mnemonic, wordlist)];
+                    case 1:
+                        privateKey = (_a.sent()).derivePath(path);
+                        return [2 /*return*/, new Wallet(privateKey)];
+                }
+            });
+        });
     };
     return Wallet;
 }(abstract_signer_1.Signer));

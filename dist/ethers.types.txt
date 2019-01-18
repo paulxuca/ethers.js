@@ -124,15 +124,15 @@ declare module 'ethers/abstract-signer' {
 }
 
 declare module 'ethers/wallet' {
-    import { BigNumber } from 'ethers/utils/bignumber';
-    import { HDNode } from 'ethers/utils/hdnode';
-    import { SigningKey } from 'ethers/utils/signing-key';
-    import { Wordlist } from 'ethers/utils/wordlist';
-    import { Signer as AbstractSigner } from 'ethers/abstract-signer';
-    import { Provider } from 'ethers/providers/abstract-provider';
-    import { ProgressCallback } from 'ethers/utils/secret-storage';
-    import { Arrayish } from 'ethers/utils/bytes';
-    import { BlockTag, TransactionRequest, TransactionResponse } from 'ethers/providers/abstract-provider';
+    import { BigNumber } from "ethers/utils/bignumber";
+    import { HDNode } from "ethers/utils/hdnode";
+    import { SigningKey } from "ethers/utils/signing-key";
+    import { Wordlist } from "ethers/utils/wordlist";
+    import { Signer as AbstractSigner } from "ethers/abstract-signer";
+    import { Provider } from "ethers/providers/abstract-provider";
+    import { ProgressCallback } from "ethers/utils/secret-storage";
+    import { Arrayish } from "ethers/utils/bytes";
+    import { BlockTag, TransactionRequest, TransactionResponse } from "ethers/providers/abstract-provider";
     export class Wallet extends AbstractSigner {
             readonly provider: Provider;
             constructor(privateKey: SigningKey | HDNode | Arrayish, provider?: Provider);
@@ -154,9 +154,9 @@ declare module 'ethers/wallet' {
             /**
                 *  Static methods to create Wallet instances.
                 */
-            static createRandom(options?: any): Wallet;
+            static createRandom(options?: any): Promise<Wallet>;
             static fromEncryptedJson(json: string, password: Arrayish, progressCallback?: ProgressCallback): Promise<Wallet>;
-            static fromMnemonic(mnemonic: string, path?: string, wordlist?: Wordlist): Wallet;
+            static fromMnemonic(mnemonic: string, path?: string, wordlist?: Wordlist): Promise<Wallet>;
     }
 }
 
@@ -637,8 +637,8 @@ declare module 'ethers/utils/abi-coder' {
 }
 
 declare module 'ethers/utils/hdnode' {
-    import { Arrayish } from 'ethers/utils/bytes';
-    import { Wordlist } from 'ethers/utils/wordlist';
+    import { Arrayish } from "ethers/utils/bytes";
+    import { Wordlist } from "ethers/utils/wordlist";
     export const defaultPath = "m/44'/60'/0'/0/0";
     export class HDNode {
         readonly privateKey: string;
@@ -660,9 +660,9 @@ declare module 'ethers/utils/hdnode' {
         derivePath(path: string): HDNode;
         static isHDNode(value: any): value is HDNode;
     }
-    export function fromMnemonic(mnemonic: string, wordlist?: Wordlist): HDNode;
+    export function fromMnemonic(mnemonic: string, wordlist?: Wordlist): Promise<HDNode>;
     export function fromSeed(seed: Arrayish): HDNode;
-    export function mnemonicToSeed(mnemonic: string, password?: string): string;
+    export function mnemonicToSeed(mnemonic: string, password?: string): Promise<string>;
     export function mnemonicToEntropy(mnemonic: string, wordlist?: Wordlist): string;
     export function entropyToMnemonic(entropy: Arrayish, wordlist?: Wordlist): string;
     export function isValidMnemonic(mnemonic: string, wordlist?: Wordlist): boolean;
@@ -703,8 +703,8 @@ declare module 'ethers/utils/wordlist' {
 }
 
 declare module 'ethers/utils/secret-storage' {
-    import { SigningKey } from 'ethers/utils/signing-key';
-    import { Arrayish } from 'ethers/utils/bytes';
+    import { SigningKey } from "ethers/utils/signing-key";
+    import { Arrayish } from "ethers/utils/bytes";
     export type ProgressCallback = (percent: number) => void;
     export type EncryptOptions = {
         iv?: Arrayish;
@@ -1053,7 +1053,7 @@ declare module 'ethers/utils/hmac' {
 }
 
 declare module 'ethers/utils/pbkdf2' {
-    import { Arrayish } from 'ethers/utils/bytes';
-    export function pbkdf2(password: Arrayish, salt: Arrayish, iterations: number, keylen: number, hashAlgorithm: string): Uint8Array;
+    import { Arrayish } from "ethers/utils/bytes";
+    export function pbkdf2(password: Arrayish, salt: Arrayish, iterations: number, keylen: number, hashAlgorithm: string): Promise<Uint8Array>;
 }
 
