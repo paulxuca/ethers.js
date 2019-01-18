@@ -130,7 +130,7 @@ export async function decryptCrowdsale(json: string, password: Arrayish | string
 }
 
 //@TODO: string or arrayish
-export async function decrypt(json: string, password: Arrayish, progressCallback?: ProgressCallback): Promise<SigningKey> {
+export function decrypt(json: string, password: Arrayish, progressCallback?: ProgressCallback): Promise<SigningKey> {
     var data = JSON.parse(json);
 
     let passwordBytes = getPassword(password);
@@ -153,7 +153,7 @@ export async function decrypt(json: string, password: Arrayish, progressCallback
         return keccak256(concat([derivedHalf, ciphertext]));
     }
 
-    var getSigningKey = async function(key: Uint8Array, reject: (error?: Error) => void) {
+    var getSigningKey = function(key: Uint8Array, reject: (error?: Error) => void) {
         var ciphertext = looseArrayify(searchPath(data, 'crypto/ciphertext'));
 
         var computedMAC = hexlify(computeMAC(key.slice(16, 32), ciphertext)).substring(2);
@@ -202,7 +202,7 @@ export async function decrypt(json: string, password: Arrayish, progressCallback
     }
 
 
-    return new Promise<SigningKey>(async function(resolve, reject) {
+    return new Promise<SigningKey>(function(resolve, reject) {
         var kdf = searchPath(data, 'crypto/kdf');
         if (kdf && typeof(kdf) === 'string') {
             if (kdf.toLowerCase() === 'scrypt') {
@@ -274,7 +274,7 @@ export async function decrypt(json: string, password: Arrayish, progressCallback
 
                 var key = pbkdf2(passwordBytes, salt, c, dkLen, prfFunc);
 
-                var signingKey = await getSigningKey(key, reject);
+                var signingKey = getSigningKey(key, reject);
                 if (!signingKey) { return; }
 
                 resolve(signingKey);

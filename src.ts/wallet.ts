@@ -132,7 +132,7 @@ export class Wallet extends AbstractSigner {
     /**
      *  Static methods to create Wallet instances.
      */
-    static async createRandom(options?: any): Promise<Wallet> {
+    static createRandom(options?: any): Wallet {
         var entropy: Uint8Array = randomBytes(16);
 
         if (!options) { options = { }; }
@@ -157,7 +157,6 @@ export class Wallet extends AbstractSigner {
             }
 
         } else if (isSecretStorageWallet(json)) {
-
             return secretStorage.decrypt(json, password, progressCallback).then(function(signingKey) {
                 return new Wallet(signingKey);
             });

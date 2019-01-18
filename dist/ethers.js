@@ -15629,160 +15629,138 @@ function decryptCrowdsale(json, password) {
 exports.decryptCrowdsale = decryptCrowdsale;
 //@TODO: string or arrayish
 function decrypt(json, password, progressCallback) {
-    return __awaiter(this, void 0, void 0, function () {
-        var data, passwordBytes, decrypt, computeMAC, getSigningKey;
-        return __generator(this, function (_a) {
-            data = JSON.parse(json);
-            passwordBytes = getPassword(password);
-            decrypt = function (key, ciphertext) {
-                var cipher = searchPath(data, 'crypto/cipher');
-                if (cipher === 'aes-128-ctr') {
-                    var iv = looseArrayify(searchPath(data, 'crypto/cipherparams/iv'));
-                    var counter = new aes_js_1.default.Counter(iv);
-                    var aesCtr = new aes_js_1.default.ModeOfOperation.ctr(key, counter);
-                    return bytes_1.arrayify(aesCtr.decrypt(ciphertext));
-                }
+    var data = JSON.parse(json);
+    var passwordBytes = getPassword(password);
+    var decrypt = function (key, ciphertext) {
+        var cipher = searchPath(data, 'crypto/cipher');
+        if (cipher === 'aes-128-ctr') {
+            var iv = looseArrayify(searchPath(data, 'crypto/cipherparams/iv'));
+            var counter = new aes_js_1.default.Counter(iv);
+            var aesCtr = new aes_js_1.default.ModeOfOperation.ctr(key, counter);
+            return bytes_1.arrayify(aesCtr.decrypt(ciphertext));
+        }
+        return null;
+    };
+    var computeMAC = function (derivedHalf, ciphertext) {
+        return keccak256_1.keccak256(bytes_1.concat([derivedHalf, ciphertext]));
+    };
+    var getSigningKey = function (key, reject) {
+        var ciphertext = looseArrayify(searchPath(data, 'crypto/ciphertext'));
+        var computedMAC = bytes_1.hexlify(computeMAC(key.slice(16, 32), ciphertext)).substring(2);
+        if (computedMAC !== searchPath(data, 'crypto/mac').toLowerCase()) {
+            reject(new Error('invalid password'));
+            return null;
+        }
+        var privateKey = decrypt(key.slice(0, 16), ciphertext);
+        var mnemonicKey = key.slice(32, 64);
+        if (!privateKey) {
+            reject(new Error('unsupported cipher'));
+            return null;
+        }
+        var signingKey = new signing_key_1.SigningKey(privateKey);
+        if (signingKey.address !== address_1.getAddress(data.address)) {
+            reject(new Error('address mismatch'));
+            return null;
+        }
+        // Version 0.1 x-ethers metadata must contain an encrypted mnemonic phrase
+        if (searchPath(data, 'x-ethers/version') === '0.1') {
+            var mnemonicCiphertext = looseArrayify(searchPath(data, 'x-ethers/mnemonicCiphertext'));
+            var mnemonicIv = looseArrayify(searchPath(data, 'x-ethers/mnemonicCounter'));
+            var mnemonicCounter = new aes_js_1.default.Counter(mnemonicIv);
+            var mnemonicAesCtr = new aes_js_1.default.ModeOfOperation.ctr(mnemonicKey, mnemonicCounter);
+            var path = searchPath(data, 'x-ethers/path') || HDNode.defaultPath;
+            var entropy = bytes_1.arrayify(mnemonicAesCtr.decrypt(mnemonicCiphertext));
+            var mnemonic = HDNode.entropyToMnemonic(entropy);
+            var node = HDNode.fromMnemonic(mnemonic).derivePath(path);
+            if (node.privateKey != bytes_1.hexlify(privateKey)) {
+                reject(new Error('mnemonic mismatch'));
                 return null;
-            };
-            computeMAC = function (derivedHalf, ciphertext) {
-                return keccak256_1.keccak256(bytes_1.concat([derivedHalf, ciphertext]));
-            };
-            getSigningKey = function (key, reject) {
-                return __awaiter(this, void 0, void 0, function () {
-                    var ciphertext, computedMAC, privateKey, mnemonicKey, signingKey, mnemonicCiphertext, mnemonicIv, mnemonicCounter, mnemonicAesCtr, path, entropy, mnemonic, node;
-                    return __generator(this, function (_a) {
-                        ciphertext = looseArrayify(searchPath(data, 'crypto/ciphertext'));
-                        computedMAC = bytes_1.hexlify(computeMAC(key.slice(16, 32), ciphertext)).substring(2);
-                        if (computedMAC !== searchPath(data, 'crypto/mac').toLowerCase()) {
-                            reject(new Error('invalid password'));
-                            return [2 /*return*/, null];
+            }
+            signingKey = new signing_key_1.SigningKey(node);
+        }
+        return signingKey;
+    };
+    return new Promise(function (resolve, reject) {
+        var kdf = searchPath(data, 'crypto/kdf');
+        if (kdf && typeof (kdf) === 'string') {
+            if (kdf.toLowerCase() === 'scrypt') {
+                var salt = looseArrayify(searchPath(data, 'crypto/kdfparams/salt'));
+                var N = parseInt(searchPath(data, 'crypto/kdfparams/n'));
+                var r = parseInt(searchPath(data, 'crypto/kdfparams/r'));
+                var p = parseInt(searchPath(data, 'crypto/kdfparams/p'));
+                if (!N || !r || !p) {
+                    reject(new Error('unsupported key-derivation function parameters'));
+                    return;
+                }
+                // Make sure N is a power of 2
+                if ((N & (N - 1)) !== 0) {
+                    reject(new Error('unsupported key-derivation function parameter value for N'));
+                    return;
+                }
+                var dkLen = parseInt(searchPath(data, 'crypto/kdfparams/dklen'));
+                if (dkLen !== 32) {
+                    reject(new Error('unsupported key-derivation derived-key length'));
+                    return;
+                }
+                if (progressCallback) {
+                    progressCallback(0);
+                }
+                var scrypt = libraries_1.default.scrypt;
+                scrypt(passwordBytes, salt, N, r, p, 64, function (error, progress, key) {
+                    if (error) {
+                        error.progress = progress;
+                        reject(error);
+                    }
+                    else if (key) {
+                        key = bytes_1.arrayify(key);
+                        var signingKey = getSigningKey(key, reject);
+                        if (!signingKey) {
+                            return;
                         }
-                        privateKey = decrypt(key.slice(0, 16), ciphertext);
-                        mnemonicKey = key.slice(32, 64);
-                        if (!privateKey) {
-                            reject(new Error('unsupported cipher'));
-                            return [2 /*return*/, null];
+                        if (progressCallback) {
+                            progressCallback(1);
                         }
-                        signingKey = new signing_key_1.SigningKey(privateKey);
-                        if (signingKey.address !== address_1.getAddress(data.address)) {
-                            reject(new Error('address mismatch'));
-                            return [2 /*return*/, null];
-                        }
-                        // Version 0.1 x-ethers metadata must contain an encrypted mnemonic phrase
-                        if (searchPath(data, 'x-ethers/version') === '0.1') {
-                            mnemonicCiphertext = looseArrayify(searchPath(data, 'x-ethers/mnemonicCiphertext'));
-                            mnemonicIv = looseArrayify(searchPath(data, 'x-ethers/mnemonicCounter'));
-                            mnemonicCounter = new aes_js_1.default.Counter(mnemonicIv);
-                            mnemonicAesCtr = new aes_js_1.default.ModeOfOperation.ctr(mnemonicKey, mnemonicCounter);
-                            path = searchPath(data, 'x-ethers/path') || HDNode.defaultPath;
-                            entropy = bytes_1.arrayify(mnemonicAesCtr.decrypt(mnemonicCiphertext));
-                            mnemonic = HDNode.entropyToMnemonic(entropy);
-                            node = HDNode.fromMnemonic(mnemonic).derivePath(path);
-                            if (node.privateKey != bytes_1.hexlify(privateKey)) {
-                                reject(new Error('mnemonic mismatch'));
-                                return [2 /*return*/, null];
-                            }
-                            signingKey = new signing_key_1.SigningKey(node);
-                        }
-                        return [2 /*return*/, signingKey];
-                    });
+                        resolve(signingKey);
+                    }
+                    else if (progressCallback) {
+                        return progressCallback(progress);
+                    }
                 });
-            };
-            return [2 /*return*/, new Promise(function (resolve, reject) {
-                    return __awaiter(this, void 0, void 0, function () {
-                        var kdf, salt, N, r, p, dkLen, scrypt, salt, prfFunc, prf, c, dkLen, key, signingKey;
-                        return __generator(this, function (_a) {
-                            switch (_a.label) {
-                                case 0:
-                                    kdf = searchPath(data, 'crypto/kdf');
-                                    if (!(kdf && typeof (kdf) === 'string')) return [3 /*break*/, 5];
-                                    if (!(kdf.toLowerCase() === 'scrypt')) return [3 /*break*/, 1];
-                                    salt = looseArrayify(searchPath(data, 'crypto/kdfparams/salt'));
-                                    N = parseInt(searchPath(data, 'crypto/kdfparams/n'));
-                                    r = parseInt(searchPath(data, 'crypto/kdfparams/r'));
-                                    p = parseInt(searchPath(data, 'crypto/kdfparams/p'));
-                                    if (!N || !r || !p) {
-                                        reject(new Error('unsupported key-derivation function parameters'));
-                                        return [2 /*return*/];
-                                    }
-                                    // Make sure N is a power of 2
-                                    if ((N & (N - 1)) !== 0) {
-                                        reject(new Error('unsupported key-derivation function parameter value for N'));
-                                        return [2 /*return*/];
-                                    }
-                                    dkLen = parseInt(searchPath(data, 'crypto/kdfparams/dklen'));
-                                    if (dkLen !== 32) {
-                                        reject(new Error('unsupported key-derivation derived-key length'));
-                                        return [2 /*return*/];
-                                    }
-                                    if (progressCallback) {
-                                        progressCallback(0);
-                                    }
-                                    scrypt = libraries_1.default.scrypt;
-                                    scrypt(passwordBytes, salt, N, r, p, 64, function (error, progress, key) {
-                                        if (error) {
-                                            error.progress = progress;
-                                            reject(error);
-                                        }
-                                        else if (key) {
-                                            key = bytes_1.arrayify(key);
-                                            var signingKey = getSigningKey(key, reject);
-                                            if (!signingKey) {
-                                                return;
-                                            }
-                                            if (progressCallback) {
-                                                progressCallback(1);
-                                            }
-                                            resolve(signingKey);
-                                        }
-                                        else if (progressCallback) {
-                                            return progressCallback(progress);
-                                        }
-                                    });
-                                    return [3 /*break*/, 4];
-                                case 1:
-                                    if (!(kdf.toLowerCase() === 'pbkdf2')) return [3 /*break*/, 3];
-                                    salt = looseArrayify(searchPath(data, 'crypto/kdfparams/salt'));
-                                    prfFunc = null;
-                                    prf = searchPath(data, 'crypto/kdfparams/prf');
-                                    if (prf === 'hmac-sha256') {
-                                        prfFunc = 'sha256';
-                                    }
-                                    else if (prf === 'hmac-sha512') {
-                                        prfFunc = 'sha512';
-                                    }
-                                    else {
-                                        reject(new Error('unsupported prf'));
-                                        return [2 /*return*/];
-                                    }
-                                    c = parseInt(searchPath(data, 'crypto/kdfparams/c'));
-                                    dkLen = parseInt(searchPath(data, 'crypto/kdfparams/dklen'));
-                                    if (dkLen !== 32) {
-                                        reject(new Error('unsupported key-derivation derived-key length'));
-                                        return [2 /*return*/];
-                                    }
-                                    key = pbkdf2_1.pbkdf2(passwordBytes, salt, c, dkLen, prfFunc);
-                                    return [4 /*yield*/, getSigningKey(key, reject)];
-                                case 2:
-                                    signingKey = _a.sent();
-                                    if (!signingKey) {
-                                        return [2 /*return*/];
-                                    }
-                                    resolve(signingKey);
-                                    return [3 /*break*/, 4];
-                                case 3:
-                                    reject(new Error('unsupported key-derivation function'));
-                                    _a.label = 4;
-                                case 4: return [3 /*break*/, 6];
-                                case 5:
-                                    reject(new Error('unsupported key-derivation function'));
-                                    _a.label = 6;
-                                case 6: return [2 /*return*/];
-                            }
-                        });
-                    });
-                })];
-        });
+            }
+            else if (kdf.toLowerCase() === 'pbkdf2') {
+                var salt = looseArrayify(searchPath(data, 'crypto/kdfparams/salt'));
+                var prfFunc = null;
+                var prf = searchPath(data, 'crypto/kdfparams/prf');
+                if (prf === 'hmac-sha256') {
+                    prfFunc = 'sha256';
+                }
+                else if (prf === 'hmac-sha512') {
+                    prfFunc = 'sha512';
+                }
+                else {
+                    reject(new Error('unsupported prf'));
+                    return;
+                }
+                var c = parseInt(searchPath(data, 'crypto/kdfparams/c'));
+                var dkLen = parseInt(searchPath(data, 'crypto/kdfparams/dklen'));
+                if (dkLen !== 32) {
+                    reject(new Error('unsupported key-derivation derived-key length'));
+                    return;
+                }
+                var key = pbkdf2_1.pbkdf2(passwordBytes, salt, c, dkLen, prfFunc);
+                var signingKey = getSigningKey(key, reject);
+                if (!signingKey) {
+                    return;
+                }
+                resolve(signingKey);
+            }
+            else {
+                reject(new Error('unsupported key-derivation function'));
+            }
+        }
+        else {
+            reject(new Error('unsupported key-derivation function'));
+        }
     });
 }
 exports.decrypt = decrypt;
@@ -17139,20 +17117,15 @@ var Wallet = /** @class */ (function (_super) {
      *  Static methods to create Wallet instances.
      */
     Wallet.createRandom = function (options) {
-        return __awaiter(this, void 0, void 0, function () {
-            var entropy, mnemonic;
-            return __generator(this, function (_a) {
-                entropy = random_bytes_1.randomBytes(16);
-                if (!options) {
-                    options = {};
-                }
-                if (options.extraEntropy) {
-                    entropy = bytes_1.arrayify(keccak256_1.keccak256(bytes_1.concat([entropy, options.extraEntropy])).substring(0, 34));
-                }
-                mnemonic = hdnode_1.entropyToMnemonic(entropy, options.locale);
-                return [2 /*return*/, Wallet.fromMnemonic(mnemonic, options.path, options.locale)];
-            });
-        });
+        var entropy = random_bytes_1.randomBytes(16);
+        if (!options) {
+            options = {};
+        }
+        if (options.extraEntropy) {
+            entropy = bytes_1.arrayify(keccak256_1.keccak256(bytes_1.concat([entropy, options.extraEntropy])).substring(0, 34));
+        }
+        var mnemonic = hdnode_1.entropyToMnemonic(entropy, options.locale);
+        return Wallet.fromMnemonic(mnemonic, options.path, options.locale);
     };
     Wallet.fromEncryptedJson = function (json, password, progressCallback) {
         return __awaiter(this, void 0, void 0, function () {

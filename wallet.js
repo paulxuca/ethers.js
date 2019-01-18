@@ -175,20 +175,15 @@ var Wallet = /** @class */ (function (_super) {
      *  Static methods to create Wallet instances.
      */
     Wallet.createRandom = function (options) {
-        return __awaiter(this, void 0, void 0, function () {
-            var entropy, mnemonic;
-            return __generator(this, function (_a) {
-                entropy = random_bytes_1.randomBytes(16);
-                if (!options) {
-                    options = {};
-                }
-                if (options.extraEntropy) {
-                    entropy = bytes_1.arrayify(keccak256_1.keccak256(bytes_1.concat([entropy, options.extraEntropy])).substring(0, 34));
-                }
-                mnemonic = hdnode_1.entropyToMnemonic(entropy, options.locale);
-                return [2 /*return*/, Wallet.fromMnemonic(mnemonic, options.path, options.locale)];
-            });
-        });
+        var entropy = random_bytes_1.randomBytes(16);
+        if (!options) {
+            options = {};
+        }
+        if (options.extraEntropy) {
+            entropy = bytes_1.arrayify(keccak256_1.keccak256(bytes_1.concat([entropy, options.extraEntropy])).substring(0, 34));
+        }
+        var mnemonic = hdnode_1.entropyToMnemonic(entropy, options.locale);
+        return Wallet.fromMnemonic(mnemonic, options.path, options.locale);
     };
     Wallet.fromEncryptedJson = function (json, password, progressCallback) {
         return __awaiter(this, void 0, void 0, function () {
