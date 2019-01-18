@@ -9,6 +9,9 @@ export const setScrypt = (scryptFn: typeof scrypt) => {
 const libraries = {
     get scrypt() {
         return _scrypt
+    },
+    set scrypt(scryptFn: typeof scrypt) {
+        _scrypt = scryptFn
     }
 }
 

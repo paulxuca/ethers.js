@@ -14900,6 +14900,9 @@ exports.setScrypt = function (scryptFn) {
 var libraries = {
     get scrypt() {
         return _scrypt;
+    },
+    set scrypt(scryptFn) {
+        _scrypt = scryptFn;
     }
 };
 exports.default = libraries;

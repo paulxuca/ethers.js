@@ -275,7 +275,7 @@ declare module 'ethers/utils/libraries' {
     import scrypt from 'scrypt-js';
     export const setScrypt: (scryptFn: typeof scrypt) => void;
     const libraries: {
-        readonly scrypt: typeof scrypt;
+        scrypt: typeof scrypt;
     };
     export default libraries;
 }
